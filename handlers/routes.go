@@ -55,6 +55,19 @@ func LoginUser(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Login Successful"})
 }
 
+func GetTasks(c *gin.Context) {
+	userID := c.Param("id")
+
+	var tasks []models.Task
+
+	if err := initializers.DB.Find(&tasks, userID).Error; err != nil {
+		c.JSON(400, gin.H{"error": "No tasks found!"})
+		return
+	}
+
+	c.JSON(200, gin.H{"tasks": tasks})
+}
+
 func MarkTaskAsCompleted(c *gin.Context) {
 	taskID := c.Param("id")
 

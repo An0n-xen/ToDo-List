@@ -33,6 +33,9 @@ func main() {
 	// Update Task
 	router.PUT("/tasks/:id", handlers.MarkTaskAsCompleted)
 
+	// Get Tasks
+	router.GET("/tasks/:id", handlers.GetTasks)
+
 	// Delete Task
 	router.DELETE("/tasks/:id", handlers.DeleteTask)
 
