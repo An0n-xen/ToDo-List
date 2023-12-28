@@ -16,7 +16,7 @@ export default function Home() {
     <div className="h-screen w-screen flex justify-center items-center">
       <div className="flex flex-col items-center">
         <div className="mb-10">
-          <h1 className="text-6xl font-extrabold font-mono">Todo-List</h1>
+          <h1 className="text-6xl font-extrabold font-tektur">Todo-List</h1>
         </div>
         <div className="flex w-[110%] text-lg text-gray-500">
           <div>
