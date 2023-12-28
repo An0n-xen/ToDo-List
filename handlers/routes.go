@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"net/http"
+	"os"
 	"time"
 
 	"example.com/Todo-list/initializers"
 	"example.com/Todo-list/models"
 	"example.com/Todo-list/utilities"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func RegisterUser(c *gin.Context) {
@@ -51,6 +54,22 @@ func LoginUser(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Incorrect Password!"})
 		return
 	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create token"})
+		return
+	}
+
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", tokenString, 3600*24, "", "", false, true)
 
 	c.JSON(200, gin.H{"message": "Login Successful"})
 }
