@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Russo_One, Tektur } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,7 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={tektur.className}>{children}</body>
+      <body className={tektur.className}>
+        <main>{children}</main>
+        <Toaster />
+      </body>
     </html>
   );
 }

@@ -1,4 +1,5 @@
-import Image from "next/image";
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -10,8 +11,10 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Home() {
+  const { toast } = useToast();
   return (
     <div className="h-screen w-screen flex justify-center items-center">
       <div className="flex flex-col items-center">
@@ -72,7 +75,17 @@ export default function Home() {
                       placeholder="Password"
                       type="password"
                     />
-                    <Button className="mt-4 w-full">Sign up</Button>
+                    <Button
+                      className="mt-4 w-full"
+                      onClick={() => {
+                        toast({
+                          title: "Scheduled: Catch up",
+                          description: "Friday, February 10, 2023 at 5:57 PM",
+                        });
+                      }}
+                    >
+                      Sign up
+                    </Button>
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>
