@@ -6,6 +6,7 @@ import (
 	"example.com/Todo-list/handlers"
 	"example.com/Todo-list/initializers"
 	"example.com/Todo-list/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -21,6 +22,9 @@ func init() {
 
 func main() {
 	router := gin.Default()
+
+	// Enable CORS
+	router.Use(cors.Default())
 
 	// register user
 	router.POST("/register", handlers.RegisterUser)
