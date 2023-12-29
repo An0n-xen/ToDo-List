@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -13,19 +14,28 @@ import (
 )
 
 func RegisterUser(c *gin.Context) {
-	var UserInput models.User
+	var userInput models.User
 
-	if err := c.BindJSON(&UserInput); err != nil {
+	if err := c.BindJSON(&userInput); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	UserInput.Password, _ = utilities.HashPassword(UserInput.Password)
+	fmt.Println(userInput)
 
-	results := initializers.DB.Create(&UserInput)
+	result, _ := utilities.IsUserExist(userInput.Username)
+
+	if result {
+		c.JSON(409, gin.H{"error": "User already exists!"})
+		return
+	}
+
+	userInput.Password, _ = utilities.HashPassword(userInput.Password)
+
+	results := initializers.DB.Create(&userInput)
 
 	if results.Error != nil {
-		c.JSON(400, gin.H{"error": results.Error})
+		c.JSON(400, gin.H{"error": results.Error.Error()})
 		return
 	}
 
