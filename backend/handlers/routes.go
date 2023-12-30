@@ -56,7 +56,7 @@ func LoginUser(c *gin.Context) {
 	var user models.User
 
 	if err := initializers.DB.Where("username = ?", userInput.Username).First(&user).Error; err != nil {
-		c.JSON(400, gin.H{"error": "User not found!"})
+		c.JSON(404, gin.H{"error": "User not found!"})
 		return
 	}
 
