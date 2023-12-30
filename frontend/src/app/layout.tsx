@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Russo_One, Tektur } from "next/font/google";
+import { Inter, Tektur } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
+import { UserContextProvider } from "./Context/user";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const russoOne = Russo_One({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-});
-
 const tektur = Tektur({
   subsets: ["latin"],
-  // weight: "400",
+  weight: "700",
   display: "swap",
 });
 
@@ -30,8 +25,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={tektur.className}>
-        <main>{children}</main>
-        <Toaster />
+        <UserContextProvider>
+          <main>{children}</main>
+          <Toaster />
+        </UserContextProvider>
       </body>
     </html>
   );
