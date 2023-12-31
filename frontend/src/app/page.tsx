@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,6 +121,12 @@ export default function Home() {
       setIsloading(false);
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/home");
+    }
+  }, [isLoggedIn, router]);
 
   return (
     <div className="flex flex-col w-screen h-screen">
