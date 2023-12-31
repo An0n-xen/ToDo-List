@@ -19,19 +19,74 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../components/Navbar";
 import { useAuthContext } from "../Context/user";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UpdateIcon } from "@radix-ui/react-icons";
 
 const MainPage = () => {
-  const { isLoggedIn, user } = useAuthContext();
-  const [date, setDate] = useState<Date>();
+  const { isLoggedIn, user, userId } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const taskNameRef = useRef<HTMLInputElement>(null);
+  const taskDescriptionRef = useRef<HTMLInputElement>(null);
+  const [date, setDate] = useState<Date>();
+  const { toast } = useToast();
   const router = useRouter();
+
+  const createTask = async () => {
+    try {
+      setIsLoading(true);
+      const taskName = taskNameRef.current?.value;
+      const taskDescription = taskDescriptionRef.current?.value;
+      const time = date?.toISOString();
+
+      if (taskName && taskDescription && time) {
+        const response = await fetch("http://localhost:5000/tasks", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: String(taskName),
+            description: String(taskDescription),
+            due_date: time,
+            user_id: userId,
+          }),
+        });
+
+        if (response.status === 200) {
+          toast({
+            title: "Success",
+            description: "Task created successfully",
+            variant: "default",
+          });
+          router.refresh();
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to create task",
+            variant: "destructive",
+          });
+        }
+
+        const responseData = response.json();
+      } else {
+        toast({
+          title: "Error",
+          description: "All fields are required",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -67,11 +122,13 @@ const MainPage = () => {
                     placeholder="Task Name"
                     className="w-full mt-2"
                     type="text"
+                    ref={taskNameRef}
                   />
                   <Input
                     placeholder="Task Description"
                     className="w-full"
                     type="text"
+                    ref={taskDescriptionRef}
                   />
                 </div>
                 <Popover>
@@ -89,10 +146,11 @@ const MainPage = () => {
                     />
                   </PopoverContent>
                 </Popover>
+
                 <DialogClose>
                   <div className="w-full flex">
-                    <Button className="w-40 ml-auto">
-                      {!isLoading && (
+                    <Button className="w-40 ml-auto" onClick={createTask}>
+                      {isLoading && (
                         <UpdateIcon className="w-5 h-5 mr-2 animate-spin" />
                       )}
                       Done

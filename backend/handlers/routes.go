@@ -39,7 +39,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "User Successfully Registered"})
+	c.JSON(200, gin.H{"message": userInput.ID})
 }
 
 func LoginUser(c *gin.Context) {
@@ -81,7 +81,7 @@ func LoginUser(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24, "", "", false, true)
 
-	c.JSON(200, gin.H{"message": "Login Successful"})
+	c.JSON(200, gin.H{"message": user.ID})
 }
 
 func GetTasks(c *gin.Context) {

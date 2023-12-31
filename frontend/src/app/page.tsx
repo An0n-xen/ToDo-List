@@ -23,7 +23,8 @@ export default function Home() {
   const [isloading, setIsloading] = useState(false);
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const { user, setUser, isLoggedIn, setIsLoggedIn } = useAuthContext();
+  const { user, setUser, isLoggedIn, setIsLoggedIn, setUserId } =
+    useAuthContext();
   const router = useRouter();
 
   const handleLogIn = async () => {
@@ -69,6 +70,7 @@ export default function Home() {
       }
 
       const responseData = await response.json();
+      setUserId(responseData.message);
     } catch (err) {
       console.log(err);
 
