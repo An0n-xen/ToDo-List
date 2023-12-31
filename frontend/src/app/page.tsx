@@ -9,7 +9,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { useState, useRef, useContext } from "react";
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -23,6 +24,7 @@ export default function Home() {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const { user, setUser, isLoggedIn, setIsLoggedIn } = useAuthContext();
+  const router = useRouter();
 
   const handleLogIn = async () => {
     try {
@@ -57,6 +59,7 @@ export default function Home() {
           description: "Login Successful",
           variant: "default",
         });
+        router.push("/home");
       } else {
         toast({
           title: "Error",
@@ -102,6 +105,7 @@ export default function Home() {
           description: "Account Created",
           variant: "default",
         });
+        router.push("/home");
       }
 
       const responseData = await response.json();
@@ -121,7 +125,7 @@ export default function Home() {
   return (
     <div className="flex flex-col w-screen h-screen">
       <Navbar />
-      <div className="flex flex-grow justify-center items-center">
+      <div className="flex flex-grow justify-center items-center -mt-10">
         <div className="flex flex-col items-center">
           <div className="mb-10">
             <h1 className="text-6xl font-extrabold font-tektur">Todo-List</h1>
