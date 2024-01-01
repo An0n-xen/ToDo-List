@@ -107,7 +107,7 @@ func MarkTaskAsCompleted(c *gin.Context) {
 		return
 	}
 
-	task.Completed = true
+	task.Completed = !task.Completed
 	initializers.DB.Save(&task)
 
 	c.JSON(200, gin.H{"message": "Task marked as completed!"})

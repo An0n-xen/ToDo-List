@@ -38,6 +38,7 @@ const MainPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tasks, setTasks] = useState<[]>([]);
   const taskNumberRef = useRef<HTMLInputElement>(null);
+  const tComRef = useRef<HTMLInputElement>(null);
   const taskNameRef = useRef<HTMLInputElement>(null);
   const taskDescriptionRef = useRef<HTMLInputElement>(null);
   const [date, setDate] = useState<Date>();
@@ -132,7 +133,36 @@ const MainPage = () => {
         router.refresh();
       }
 
-      const responseData = await response.json();
+      // const responseData = await response.json();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const markTask = async () => {
+    try {
+      setIsLoading(true);
+      const taskId = tComRef.current?.value;
+      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200) {
+        toast({
+          title: "Success",
+          description: "Task updated Successfully",
+          variant: "default",
+        });
+        getTask();
+        router.refresh();
+      }
+
+      // const responseData = await response.json();
     } catch (err) {
       console.log(err);
     } finally {
@@ -258,30 +288,30 @@ const MainPage = () => {
               <Dialog>
                 <DialogTrigger>
                   <Button className=" bg-green-500 hover:bg-green-700">
-                    Complete
+                    Mark Task
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Remove Task</DialogTitle>
-                    <DialogDescription>Remove task from list</DialogDescription>
+                    <DialogTitle>Mark Task</DialogTitle>
+                    <DialogDescription>Mark task as complete</DialogDescription>
                   </DialogHeader>
                   <div className="flex flex-col gap-3">
                     <Input
                       placeholder="Task Number"
                       className="w-"
                       type="number"
-                      ref={taskNumberRef}
+                      ref={tComRef}
                     />
                   </div>
 
                   <DialogClose>
                     <div className="">
-                      <Button variant={"destructive"} className="w-40 ml-auto">
+                      <Button className="w-40 ml-auto" onClick={markTask}>
                         {isLoading && (
                           <UpdateIcon className="w-5 h-5 mr-2 animate-spin" />
                         )}
-                        Done
+                        Mark
                       </Button>
                     </div>
                   </DialogClose>
