@@ -29,9 +29,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UpdateIcon } from "@radix-ui/react-icons";
 
+import { columns, Task } from "../components/tasks/columns";
+import { DataTable } from "../components/tasks/data-table";
+import { get } from "http";
+
 const MainPage = () => {
   const { isLoggedIn, user, userId } = useAuthContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [tasks, setTasks] = useState<[]>([]);
+  const taskNumberRef = useRef<HTMLInputElement>(null);
   const taskNameRef = useRef<HTMLInputElement>(null);
   const taskDescriptionRef = useRef<HTMLInputElement>(null);
   const [date, setDate] = useState<Date>();
@@ -99,9 +105,38 @@ const MainPage = () => {
         },
       });
       const responseData = await response.json();
-      console.log(responseData);
+      setTasks(responseData.tasks);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const removeTask = async () => {
+    try {
+      setIsLoading(true);
+      const taskId = taskNumberRef.current?.value;
+      const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200) {
+        toast({
+          title: "Success",
+          description: "Task deleted successfully",
+          variant: "default",
+        });
+        getTask();
+        router.refresh();
+      }
+
+      const responseData = await response.json();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -116,6 +151,7 @@ const MainPage = () => {
   return (
     <div className="w-screen h-screen flex flex-col">
       <Navbar />
+
       <div className="px-16 mt-10 flex flex-col h-full mb-10">
         <div className="lg:mt-5 h-fit">
           <p className="text-2xl font-mono lg:text-3xl">
@@ -123,63 +159,144 @@ const MainPage = () => {
           </p>
         </div>
 
-        <div className="flex-grow flex-shrink mt-10 lg:mt-16">
+        <div className="flex-grow flex mt-10 lg:mt-16">
           <div className="border-r-2 w-44 h-full lg:w-60 text-center pt-10 lg:pt-5">
-            <Dialog>
-              <DialogTrigger>
-                <Button>Add Task</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Task</DialogTitle>
-                  <DialogDescription>
-                    Add new task to your list
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col gap-3">
-                  <Input
-                    placeholder="Task Name"
-                    className="w-full mt-2"
-                    type="text"
-                    ref={taskNameRef}
-                  />
-                  <Input
-                    placeholder="Task Description"
-                    className="w-full"
-                    type="text"
-                    ref={taskDescriptionRef}
-                  />
-                </div>
-                <Popover>
-                  <PopoverTrigger>
-                    <Button className="mt-4 w-full">
-                      <CalendarIcon className="w-5 h-5 mr-2" />
-                      {date ? date.toLocaleDateString() : "Select Date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
+            <div>
+              <Dialog>
+                <DialogTrigger>
+                  <Button>Add Task</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Task</DialogTitle>
+                    <DialogDescription>
+                      Add new task to your list
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      placeholder="Task Name"
+                      className="w-full mt-2"
+                      type="text"
+                      ref={taskNameRef}
                     />
-                  </PopoverContent>
-                </Popover>
-
-                <DialogClose>
-                  <div className="w-full flex">
-                    <Button className="w-40 ml-auto" onClick={createTask}>
-                      {isLoading && (
-                        <UpdateIcon className="w-5 h-5 mr-2 animate-spin" />
-                      )}
-                      Done
-                    </Button>
+                    <Input
+                      placeholder="Task Description"
+                      className="w-full"
+                      type="text"
+                      ref={taskDescriptionRef}
+                    />
                   </div>
-                </DialogClose>
-              </DialogContent>
-            </Dialog>
+                  <Popover>
+                    <PopoverTrigger>
+                      <Button className="mt-4 w-full">
+                        <CalendarIcon className="w-5 h-5 mr-2" />
+                        {date ? date.toLocaleDateString() : "Select Date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <DialogClose>
+                    <div className="w-full flex">
+                      <Button className="w-40 ml-auto" onClick={createTask}>
+                        {isLoading && (
+                          <UpdateIcon className="w-5 h-5 mr-2 animate-spin" />
+                        )}
+                        Done
+                      </Button>
+                    </div>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="mt-5">
+              <Dialog>
+                <DialogTrigger>
+                  <Button variant={"destructive"}>Rem Task</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Remove Task</DialogTitle>
+                    <DialogDescription>Remove task from list</DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      placeholder="Task Number"
+                      className="w-"
+                      type="number"
+                      ref={taskNumberRef}
+                    />
+                  </div>
+
+                  <DialogClose>
+                    <div className="">
+                      <Button
+                        variant={"destructive"}
+                        className="w-40 ml-auto"
+                        onClick={removeTask}
+                      >
+                        {isLoading && (
+                          <UpdateIcon className="w-5 h-5 mr-2 animate-spin" />
+                        )}
+                        Done
+                      </Button>
+                    </div>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="mt-5">
+              <Dialog>
+                <DialogTrigger>
+                  <Button className=" bg-green-500 hover:bg-green-700">
+                    Complete
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Remove Task</DialogTitle>
+                    <DialogDescription>Remove task from list</DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      placeholder="Task Number"
+                      className="w-"
+                      type="number"
+                      ref={taskNumberRef}
+                    />
+                  </div>
+
+                  <DialogClose>
+                    <div className="">
+                      <Button variant={"destructive"} className="w-40 ml-auto">
+                        {isLoading && (
+                          <UpdateIcon className="w-5 h-5 mr-2 animate-spin" />
+                        )}
+                        Done
+                      </Button>
+                    </div>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
-          <div className="flex-grow"></div>
+          <div className="flex-grow ml-10">
+            <div className="mb-4">
+              <p className="text-xl">Your tasks</p>
+            </div>
+            <div>
+              <DataTable columns={columns} data={tasks} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
