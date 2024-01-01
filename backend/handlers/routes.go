@@ -39,7 +39,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "User Successfully Registered"})
+	c.JSON(200, gin.H{"message": userInput.ID})
 }
 
 func LoginUser(c *gin.Context) {
@@ -78,10 +78,10 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24, "", "", false, true)
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie("Authorization", tokenString, 3600*24, "/", "localhost", false, false)
 
-	c.JSON(200, gin.H{"message": "Login Successful"})
+	c.JSON(200, gin.H{"message": user.ID})
 }
 
 func GetTasks(c *gin.Context) {
@@ -89,7 +89,7 @@ func GetTasks(c *gin.Context) {
 
 	var tasks []models.Task
 
-	if err := initializers.DB.Find(&tasks, userID).Error; err != nil {
+	if err := initializers.DB.Where("user_id = ?", userID).Find(&tasks).Error; err != nil {
 		c.JSON(400, gin.H{"error": "No tasks found!"})
 		return
 	}
@@ -107,7 +107,7 @@ func MarkTaskAsCompleted(c *gin.Context) {
 		return
 	}
 
-	task.Completed = true
+	task.Completed = !task.Completed
 	initializers.DB.Save(&task)
 
 	c.JSON(200, gin.H{"message": "Task marked as completed!"})
