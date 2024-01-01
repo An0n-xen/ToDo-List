@@ -20,6 +20,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import React, { useEffect, useState, useRef } from "react";
+
 import Navbar from "../components/Navbar";
 import { useAuthContext } from "../Context/user";
 import { useRouter } from "next/navigation";
@@ -65,6 +66,7 @@ const MainPage = () => {
             variant: "default",
           });
           router.refresh();
+          getTask();
         } else {
           toast({
             title: "Error",
@@ -88,9 +90,26 @@ const MainPage = () => {
     }
   };
 
+  const getTask = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/tasks/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (!isLoggedIn) {
       router.back();
+    } else {
+      getTask();
     }
   }, [isLoggedIn, router]);
 

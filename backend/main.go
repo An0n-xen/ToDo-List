@@ -5,7 +5,6 @@ import (
 
 	"example.com/Todo-list/handlers"
 	"example.com/Todo-list/initializers"
-	"example.com/Todo-list/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -39,7 +38,7 @@ func main() {
 	router.PUT("/tasks/:id", handlers.MarkTaskAsCompleted)
 
 	// Get Tasks
-	router.GET("/tasks/:id", middleware.Auth, handlers.GetTasks)
+	router.GET("/tasks/:id", handlers.GetTasks)
 
 	// Delete Task
 	router.DELETE("/tasks/:id", handlers.DeleteTask)
