@@ -5,7 +5,10 @@
 </div>
 
 # Needed to run
+* Install dependencies with ``` go get . ``` and ``` pnpm i ``` for frontend UI
 * Database (Postgres)
-  Backend was written in go with an ORM called GORM
+  Backend was written in go with an ORM called GORM and the connect string as
   <br>
-  Install dependencies with ``` go get . ```
+  ``` "user=[your user] password=[your password] dbname=[your dbname] port=5432 sslmode=disable" ```
+
+  
